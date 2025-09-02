@@ -2,23 +2,25 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/spf13/pflag"
+
 	"github.com/skip2/go-qrcode"
 	qrcodedecode "github.com/tuotoo/qrcode"
 )
 
 func main() {
-	inputPath := flag.String("input", "", "Path to input file (optional, reads from stdin if not provided)")
-	outputPath := flag.String("output", "", "Path to output JPEG file (required if --format=jpeg)")
-	format := flag.String("format", "display", "Output format: 'jpeg' or 'display'")
-	decode := flag.Bool("decode", false, "Decode QR code from image file")
-	flag.Parse()
+	inputPath := pflag.StringP("input", "i", "", "Path to input file (optional, reads from stdin if not provided)")
+	outputPath := pflag.StringP("output", "o", "", "Path to output JPEG file (required if --format=jpeg)")
+	format := pflag.StringP("format", "f", "display", "Output format: 'jpeg' or 'display'")
+	decode := pflag.BoolP("decode", "d", false, "Decode QR code from image file")
+
+	pflag.Parse()
 
 	if *decode {
 		if *inputPath == "" {
