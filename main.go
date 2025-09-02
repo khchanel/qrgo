@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -16,7 +15,7 @@ import (
 
 func readInput(inputPath string, binaryMode bool) (string, error) {
 	if inputPath != "" {
-		bytes, err := ioutil.ReadFile(inputPath)
+		bytes, err := os.ReadFile(inputPath)
 		if err != nil {
 			return "", err
 		}
@@ -79,7 +78,7 @@ func decodeQRCodeImage(inputPath string, binaryMode bool, outputPath string) err
 		if outputPath == "" {
 			fmt.Println("Decoded binary data (base64):", qrMatrix.Content)
 		} else {
-			err := ioutil.WriteFile(outputPath, decoded, 0644)
+			err := os.WriteFile(outputPath, decoded, 0644)
 			if err != nil {
 				return err
 			}
