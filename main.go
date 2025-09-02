@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"fmt"
 	"image/jpeg"
 	"io/ioutil"
@@ -13,11 +14,14 @@ import (
 	qrcodedecode "github.com/tuotoo/qrcode"
 )
 
-func readInput(inputPath string) (string, error) {
+func readInput(inputPath string, binaryMode bool) (string, error) {
 	if inputPath != "" {
 		bytes, err := ioutil.ReadFile(inputPath)
 		if err != nil {
 			return "", err
+		}
+		if binaryMode {
+			return base64.StdEncoding.EncodeToString(bytes), nil
 		}
 		return string(bytes), nil
 	}
@@ -57,7 +61,7 @@ func displayQRCodeTerminal(data string) error {
 	return nil
 }
 
-func decodeQRCodeImage(inputPath string) error {
+func decodeQRCodeImage(inputPath string, binaryMode bool, outputPath string) error {
 	file, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -67,15 +71,32 @@ func decodeQRCodeImage(inputPath string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Decoded QR data:", qrMatrix.Content)
+	if binaryMode {
+		decoded, err := base64.StdEncoding.DecodeString(qrMatrix.Content)
+		if err != nil {
+			return err
+		}
+		if outputPath == "" {
+			fmt.Println("Decoded binary data (base64):", qrMatrix.Content)
+		} else {
+			err := ioutil.WriteFile(outputPath, decoded, 0644)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Decoded binary data written to:", outputPath)
+		}
+	} else {
+		fmt.Println("Decoded QR data:", qrMatrix.Content)
+	}
 	return nil
 }
 
 func main() {
 	inputPath := pflag.StringP("input", "i", "", "Path to input file (optional, reads from stdin if not provided)")
-	outputPath := pflag.StringP("output", "o", "", "Path to output JPEG file (required if --format=jpeg)")
+	outputPath := pflag.StringP("output", "o", "", "Path to output file (JPEG for encode, binary for decode)")
 	format := pflag.StringP("format", "f", "display", "Output format: 'jpeg' or 'display'")
 	decode := pflag.BoolP("decode", "d", false, "Decode QR code from image file")
+	binaryMode := pflag.BoolP("binary", "b", false, "Treat input as binary and encode as base64")
 
 	pflag.Parse()
 
@@ -84,14 +105,14 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Input image path required for decoding")
 			os.Exit(1)
 		}
-		if err := decodeQRCodeImage(*inputPath); err != nil {
+		if err := decodeQRCodeImage(*inputPath, *binaryMode, *outputPath); err != nil {
 			fmt.Fprintf(os.Stderr, "Error decoding QR code: %v\n", err)
 			os.Exit(1)
 		}
 		return
 	}
 
-	data, err := readInput(*inputPath)
+	data, err := readInput(*inputPath, *binaryMode)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
 		os.Exit(1)
