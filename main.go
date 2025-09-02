@@ -94,7 +94,7 @@ func decodeQRCodeImage(inputPath string, binaryMode bool, outputPath string) err
 func main() {
 	inputPath := pflag.StringP("input", "i", "", "Path to input file (optional, reads from stdin if not provided)")
 	outputPath := pflag.StringP("output", "o", "", "Path to output file (JPEG for encode, binary for decode)")
-	format := pflag.StringP("format", "f", "display", "Output format: 'jpeg' or 'display'")
+	ascii := pflag.BoolP("ascii", "a", false, "Display QR code in terminal as ASCII art")
 	decode := pflag.BoolP("decode", "d", false, "Decode QR code from image file")
 	binaryMode := pflag.BoolP("binary", "b", false, "Treat input as binary and encode as base64")
 
@@ -118,18 +118,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *format == "jpeg" {
+	if *ascii {
+		if err := displayQRCodeTerminal(data); err != nil {
+			fmt.Fprintf(os.Stderr, "Error displaying QR code: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
 		if *outputPath == "" {
 			fmt.Fprintln(os.Stderr, "Output path required for JPEG format")
 			os.Exit(1)
 		}
 		if err := generateQRCodeJPEG(data, *outputPath); err != nil {
 			fmt.Fprintf(os.Stderr, "Error generating QR code JPEG: %v\n", err)
-			os.Exit(1)
-		}
-	} else {
-		if err := displayQRCodeTerminal(data); err != nil {
-			fmt.Fprintf(os.Stderr, "Error displaying QR code: %v\n", err)
 			os.Exit(1)
 		}
 	}
