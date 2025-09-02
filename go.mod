@@ -1,4 +1,4 @@
-module goqr
+module github.com/khchanel/qrgo
 
 go 1.25.0
 

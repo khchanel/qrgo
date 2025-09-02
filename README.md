@@ -1,4 +1,5 @@
-# GoQR: QR Code Generator & Decoder CLI Tool
+
+# QRGo: QR Code Generator & Decoder CLI Tool
 
 A simple command-line tool written in Go to generate QR codes from file or stdin input, and decode QR codes from image files. Output as JPEG or display in terminal.
 
@@ -13,45 +14,46 @@ A simple command-line tool written in Go to generate QR codes from file or stdin
    ```
 3. Build the executable:
    ```powershell
-   go build -o goqr.exe main.go
+   go build -o qrgo.exe main.go
    ```
 
 ## Usage
 
-### Generate and display QR code in terminal
+### Display QR code in terminal (ASCII art)
 ```powershell
 # From file
-./goqr.exe --input path/to/input.txt --format display
+./qrgo.exe --input path/to/input.txt --ascii
 
 # From stdin
-Get-Content path/to/input.txt | ./goqr.exe --format display
+Get-Content path/to/input.txt | ./qrgo.exe --ascii
 ```
 
 ### Generate QR code and save as JPEG
 ```powershell
 # From file
-./goqr.exe --input path/to/input.txt --format jpeg --output qr_output.jpg
+./qrgo.exe --input path/to/input.txt --output qr_output.jpg
 
 # From stdin
-Get-Content path/to/input.txt | ./goqr.exe --format jpeg --output qr_output.jpg
+Get-Content path/to/input.txt | ./qrgo.exe --output qr_output.jpg
 ```
 
 ### Decode QR code from image file
 ```powershell
-./goqr.exe --input qr_output.jpg --decode
+./qrgo.exe --input qr_output.jpg --decode
 ```
 
 ## Arguments
-- `--input`   : Path to input file (for encoding) or image file (for decoding)
-- `--format`  : Output format: `jpeg` or `display` (default: `display`, for encoding only)
-- `--output`  : Path to output JPEG file (required if `--format=jpeg`, for encoding only)
-- `--decode`  : Decode QR code from image file (prints decoded content)
+- `--input`, `-i`   : Path to input file (for encoding) or image file (for decoding)
+- `--output`, `-o`  : Path to output JPEG file (required for JPEG output)
+- `--ascii`, `-a`   : Display QR code in terminal as ASCII art
+- `--decode`, `-d`  : Decode QR code from image file (prints decoded content)
+- `--binary`, `-b`  : Treat input as binary and encode as base64
 
 ## Example
 ```powershell
-./goqr.exe --input "hello.txt" --format display
-./goqr.exe --input "hello.txt" --format jpeg --output "hello.jpg"
-./goqr.exe --input "hello.jpg" --decode
+./qrgo.exe --input "hello.txt" --ascii
+./qrgo.exe --input "hello.txt" --output "hello.jpg"
+./qrgo.exe --input "hello.jpg" --decode
 ```
 
 ## License
